@@ -26,22 +26,12 @@ class Phone(Field):
         if not (isinstance(value, str) and value.isdigit() and len(value) == 10):
             raise ValueError("Invalid phone number")
         self.__value = value
-    
-    @property
-    def value(self):
-        return self.__value
-
-    @value.setter
-    def value(self, value):
-        if not (isinstance(value, str) and value.isdigit() and len(value) == 10):
-            raise ValueError("Invalid phone number")
-        self.__value = value
-        
+           
 class Birthday(Field):  
     @Field.value.setter
     def value(self, value):
         try:
-            self._Field__value = datetime.strptime(value, '%Y-%m-%d')
+            self.__value = datetime.strptime(value, '%Y-%m-%d')
         except ValueError:
             raise ValueError("Invalid date")
        
@@ -58,6 +48,7 @@ class Record:
         next_birthday = datetime(now.year, self.birthday.value.month, self.birthday.value.day)
         if now > next_birthday:
             next_birthday = datetime(now.year + 1, self.birthday.value.month, self.birthday.value.day)
+        print((next_birthday - now).days)
         return (next_birthday - now).days
     
     def add_phone(self, phone_number):
@@ -103,66 +94,4 @@ class AddressBook(UserDict):
                 yield result
                 counter = 0
                 result = ""
-
-# book = AddressBook()
-
-# john_record = Record("John")
-
-# john_record.birthday = Birthday("1990-10-8")
-
-# john_record.add_phone("1234567890")
-# john_record.add_phone("5555555555")
-
-# book.add_record(john_record)
-# print(john_record.days_to_birthday())
-
-# jane_record = Record("Jane")
-# jane_record.add_phone("9876543210")
-# book.add_record(jane_record)
-
-# bill_record = Record("Bill")
-# bill_record.add_phone("1111111111")
-# book.add_record(bill_record)
-
-# lee_record = Record("Lee")
-# lee_record.add_phone("2222222222")
-# book.add_record(lee_record)
-
-# for name, record in book.data.items():
-#     print(record)
-
-# john = book.find("John")
-# john.edit_phone("1234567890", "1112223333")
-# print(john)
-
-# i = book.iterator()
-# print(next(i))
-
-
-# found_phone = john.find_phone("5555555555")
-# print(f"{john.name}: {found_phone}")
-
-
-# book.delete("Jane")
-
-# class AddressBook(UserDict):
-#     def __init__(self, records_per_page=10):
-#         super().__init__()
-#         self.records_per_page = records_per_page
-    
-#     def add_record(self, record):
-#         self.data[record.name.value] = record
-
-#     def delete(self, name):
-#         if name in self.data:
-#             del self.data[name]
-
-#     def find(self, name):
-#         return self.data.get(name)
-    
-#     def iterator(self):
-#         records = list(self.data.values())
-#         for i in range(0, len(records), self.records_per_page):
-#             yield '\n'.join(str(record) for record in records[i:i + self.records_per_page]) # records[i:i + self.records_per_page]
-            
-
+                

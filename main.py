@@ -48,7 +48,6 @@ class Record:
         next_birthday = datetime(now.year, self.birthday.value.month, self.birthday.value.day)
         if now > next_birthday:
             next_birthday = datetime(now.year + 1, self.birthday.value.month, self.birthday.value.day)
-        print((next_birthday - now).days)
         return (next_birthday - now).days
     
     def add_phone(self, phone_number):

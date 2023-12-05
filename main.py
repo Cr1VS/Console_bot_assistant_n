@@ -1,5 +1,6 @@
 from collections import UserDict
 from datetime import datetime
+import json
 
 class Field:
     def __init__(self, value):
@@ -25,13 +26,13 @@ class Phone(Field):
     def value(self, value):
         if not (isinstance(value, str) and value.isdigit() and len(value) == 10):
             raise ValueError("Invalid phone number")
-        self.__value = value
+        self._Field__value = value
            
 class Birthday(Field):  
     @Field.value.setter
     def value(self, value):
         try:
-            self.__value = datetime.strptime(value, '%Y-%m-%d')
+            self._Field__value = datetime.strptime(value, '%Y-%m-%d')
         except ValueError:
             raise ValueError("Invalid date")
        
@@ -68,9 +69,13 @@ class Record:
 
     def find_phone(self, phone_number):
         return next((phone for phone in self.phones if phone.value == phone_number), None)
-
+    
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(str(p) for p in self.phones)}"
+        phones_str = '\n'.join([f'    {p}' for p in self.phones])
+        birthday_str = f"\n🎂 Birthday: {self.birthday.value.strftime('%Y-%m-%d')}" if self.birthday else ""
+        return "👤 Contact name: {}\n📞 Phones:\n{}{}".format(self.name.value, phones_str, birthday_str)
+
+    
 
 class AddressBook(UserDict): 
     def add_record(self, record):
@@ -92,5 +97,76 @@ class AddressBook(UserDict):
             if counter >= item_number:
                 yield result
                 counter = 0
-                result = ""
+                result = ""            
                 
+    @staticmethod
+    def serialize_record(obj):
+        if isinstance(obj, datetime):
+            return obj.strftime('%Y-%m-%d')
+        return obj.__dict__ if hasattr(obj, '__dict__') else obj
+    
+    def save_to_file(self, filename):
+        with open(filename, 'w') as file:
+            data = self.data.copy()
+            for name, record in data.items():
+                if record.birthday:
+                    record.birthday = record.birthday.value.strftime('%Y-%m-%d')
+                record.phones = [phone.value for phone in record.phones]
+            json.dump(data, file, default=self.serialize_record, indent=4)
+
+    def load_from_file(self, filename):
+        try:
+            with open(filename, 'r') as file:
+                data = json.load(file)
+                for name, record_data in data.items():
+                    birthday_data = record_data.get('birthday')
+                    if birthday_data and isinstance(birthday_data, str):
+                        birthday = birthday_data
+                    else:
+                        birthday = None
+                    record = Record(name, birthday)
+                    for phone_data in record_data.get('phones', []):
+                        record.add_phone(phone_data)
+                    self.add_record(record)
+        except FileNotFoundError:
+            print("Файл не найден.")
+
+    def search(self, query):
+        results = []
+        for name, record in self.data.items():
+            if query.lower() in name.lower():
+                results.append(record)
+            else:
+                for phone in record.phones:
+                    if query in phone.value:
+                        results.append(record)
+                        break
+        return results
+    
+def main():
+    book = AddressBook()
+    book.load_from_file("data.json")
+    
+    query = input("Enter search query: ")   
+    search_results = book.search(query)
+
+    if search_results:
+        print("Search results:")
+        for result in search_results:
+            print(result)
+    else:
+        print("No matching records found.")
+        
+        
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+

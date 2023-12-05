@@ -1,0 +1,39 @@
+{
+    "John": {
+        "name": {
+            "_Field__value": "John"
+        },
+        "phones": [
+            "1234567890",
+            "5555555555"
+        ],
+        "birthday": "1990-10-08"
+    },
+    "Jane": {
+        "name": {
+            "_Field__value": "Jane"
+        },
+        "phones": [
+            "9876543210"
+        ],
+        "birthday": "2000-12-12"
+    },
+    "Bill": {
+        "name": {
+            "_Field__value": "Bill"
+        },
+        "phones": [
+            "1111111111"
+        ],
+        "birthday": null
+    },
+    "Lee": {
+        "name": {
+            "_Field__value": "Lee"
+        },
+        "phones": [
+            "2222222222"
+        ],
+        "birthday": null
+    }
+}
